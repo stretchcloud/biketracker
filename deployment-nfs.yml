@@ -5,7 +5,7 @@ metadata:
 provisioner: oracle.com/oci-fss
 parameters:
   mntTargetId:
-    ocid1.mounttarget.oc1.eu_frankfurt_1.aaaaaby27ve3kavtmzzgcllqojxwiotfouwwm4tbnzvwm5lsoqwtcllbmqwtcaaa
+    ocid1.mounttarget.oc1.eu_frankfurt_1.aaaaacaaa
 ---
 apiVersion: v1
 kind: PersistentVolume
