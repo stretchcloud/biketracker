@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: biketracker
-        image: fra.ocir.io/oracsmnorthuk/biketracker:1.0
+        image: fra.ocir.io/<your tenant>/biketracker:1.0
         imagePullPolicy: Always
         ports:
         - containerPort: 4000
