@@ -1,0 +1,77 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: oci-fss-biketracker1
+provisioner: oracle.com/oci-fss
+parameters:
+  mntTargetId:
+    ocid1.mounttarget.oc1.eu_frankfurt_1.aaaaaby27ve3kavtmzzgcllqojxwiotfouwwm4tbnzvwm5lsoqwtcllbmqwtcaaa
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: oke-fsspv-biketracker1
+spec:
+  storageClassName: oci-fss-biketracker1
+  capacity:
+    storage: 100Gi
+  accessModes:
+  - ReadWriteMany
+  mountOptions:
+  - nosuid
+  nfs:
+    server: 10.0.0.17
+    path: "/biketracker"
+    readOnly: false
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: oke-fsspvc-biketracker1
+spec:
+  storageClassName: oci-fss-biketracker1
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  volumeName: oke-fsspv-biketracker1
+---  
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: biketracker
+spec:
+  replicas: 1
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: biketracker
+  template:
+    metadata:
+      labels:
+        app: biketracker
+    spec:
+      containers:
+      - name: biketracker
+        image: fra.ocir.io/oracsmnorthuk/biketracker:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+          name: default
+        env:
+        - name: dbconfig
+          valueFrom:
+            configMapKeyRef:
+              name: biketracker
+              key: biketracker-config.json
+        volumeMounts:
+        - name: nfs
+          mountPath: "/usr/lib/oracle/18.3/client64/lib/wallet"
+      imagePullSecrets:
+      - name:  ocir-secret
+      volumes:
+      - name: nfs
+        persistentVolumeClaim:
+            claimName: oke-fsspvc-biketracker1
+            

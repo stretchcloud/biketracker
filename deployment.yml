@@ -1,0 +1,38 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: biketracker
+spec:
+  replicas: 2
+  revisionHistoryLimit: 0
+  selector:
+    matchLabels:
+      app: biketracker
+  template:
+    metadata:
+      labels:
+        app: biketracker
+    spec:
+      containers:
+      - name: biketracker
+        image: fra.ocir.io/oracsmnorthuk/biketracker:1.0
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 4000
+          name: default
+        env:
+        - name: dbconfig
+          valueFrom:
+            secretKeyRef:
+              name: biketracker
+              key: biketracker-config.json
+        volumeMounts:
+        - name: nfs
+          mountPath: "/usr/lib/oracle/18.3/client64/lib/wallet"
+      imagePullSecrets:
+      - name:  ocir-secret
+      volumes:
+      - name: nfs
+        persistentVolumeClaim:
+            claimName: oke-fsspvc-biketracker1
+
