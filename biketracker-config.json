@@ -1,0 +1,5 @@
+{
+    "dbuser":"admin",
+    "dbpassword":"<password here>",
+    "connectString":"biketrackerATP_TP"
+}
